@@ -1,0 +1,14 @@
+#display {
+  width:200px;
+  height:100px;
+  border:thin black solid;
+}
+
+#display2 {
+  width:200px;
+  height:100px;
+  border:thin black solid;
+}
+
+#display #siganture-canvas {
+}
