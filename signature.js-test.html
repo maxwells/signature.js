@@ -12,17 +12,17 @@
     <div id="my-signature-div" style="width:400px; height:200px; margin:300px; border: thin solid black"></div>
     <script type='text/javascript'>
       var signature = new Signature({
-        displayId: 'display',
+        displayId: 'my-signature-div',
         watermark: {
-          url: 'http://www.w3schools.com/images/compatible_chrome.gif',
+          url: 'img/github.png',
           position: Signature.CENTER,
-          alpha: 0.3,
+          alpha: 0.2,
           width: 100,
           height: 100
         }
       });
       var signature = new Signature( {
-          displayId: 'my-signature-div',
+          displayId: 'display',
           explanation: {
             text: "Signature signifies acceptace of aforementioned end user license agreement.",
             font: "georgia",

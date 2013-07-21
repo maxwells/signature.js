@@ -47,11 +47,11 @@ var signature = new Signature({ displayId: 'my-signature-div' });
 
 ```javascript
 var signature = new Signature({
-	displayId: 'display',
+	displayId: 'my-signature-div',
 	watermark: {
 		url: 'http://www.w3schools.com/images/compatible_chrome.gif',
 		position: Signature.CENTER, // any cardinal/ordinal direction or CENTER (defaults to NORTH)
-		alpha: 0.3, // 0-1, representing transparency (default: 0.2)
+		alpha: 0.2, // 0-1, representing transparency (default: 0.2)
 		width: 100, // width of displayed watermark
 		height: 100 // height of displayed watermark
 	}
