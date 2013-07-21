@@ -50,10 +50,10 @@ var signature = new Signature({
 	displayId: 'display',
 	watermark: {
 		url: 'http://www.w3schools.com/images/compatible_chrome.gif',
-		position: Signature.CENTER,
-		alpha: 1,
-		width: 100,
-		height: 100
+		position: Signature.CENTER, // any cardinal/ordinal direction or CENTER (defaults to NORTH)
+		alpha: 0.3, // 0-1, representing transparency (default: 0.2)
+		width: 100, // width of displayed watermark
+		height: 100 // height of displayed watermark
 	}
 });
 ```
@@ -71,7 +71,7 @@ var signature = new Signature( {
 		size: 12, // defaults to 10 point
 		lineHeight: 13, // defaults to 1.2em
 		maxWidth: 150, // defaults to entire width
-		position: Signature.NORTH_EAST // any cardinal/ordinal direction or CENTER
+		position: Signature.NORTH_EAST // any cardinal/ordinal direction or CENTER (defaults to NORTH)
 	}
 });
 ```
