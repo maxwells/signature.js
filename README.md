@@ -1,6 +1,6 @@
 ## Signature.js
 
-Super lightweight (~7kb minified), self-contained (no libraries), HTML 5 & Javascript signature capture tool.
+Super lightweight (~8kb minified), self-contained (no libraries), HTML 5 & Javascript signature capture tool.
 
 ### Examples
 
