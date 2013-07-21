@@ -9,23 +9,27 @@
   <body>
     <div id="display"></div>
     <div id="display2"></div>
+    <div id="my-signature-div" style="width:400px; height:200px; margin:300px; border: thin solid black"></div>
     <script type='text/javascript'>
-      var signature = new Signature({displayId: 'display', watermark: {url: 'http://www.w3schools.com/images/compatible_chrome.gif', position: Signature.CENTER, alpha: 1, width: 100, height: 100} });
+      var signature = new Signature({
+        displayId: 'display',
+        watermark: {
+          url: 'http://www.w3schools.com/images/compatible_chrome.gif',
+          position: Signature.CENTER,
+          alpha: 0.3,
+          width: 100,
+          height: 100
+        }
+      });
       var signature = new Signature( {
-          displayId: 'display2',
-          watermark: {
-            url: 'http://www.w3schools.com/images/compatible_chrome.gif',
-            position: Signature.SOUTH_WEST,
-            alpha: 0.1,
-            scale: 2
-          },
+          displayId: 'my-signature-div',
           explanation: {
             text: "Signature signifies acceptace of aforementioned end user license agreement.",
             font: "georgia",
             color: "#aaa",
-            size: 10,
+            size: 12,
             lineHeight: 13,
-            maxWidth: 150,
+            maxWidth: 250,
             position: Signature.NORTH_EAST
           }
         });
