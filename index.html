@@ -42,13 +42,15 @@
 <a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
 
 <center>
-      <p><b><i>If these examples do not work on your device, please note it in a <a href="https://github.com/maxwells/signature.js/issues/new">new issue</a> </i></b></p>
+      <p><b><i>If these examples do not work on your device, please note it in a <a href="https://github.com/maxwells/signature.js/issues/new">new issue</a>. Note that none of these are hooked up to save. </i></b></p>
       <p>Regular old signature pad</p>
       <div id="display" class="signature-pad"></div>
       <p>Signature pad with watermark</p>
       <div id="display2" class="signature-pad"></div>
       <p>Signature pad with explanation</p>
       <div id="display3" class="signature-pad"></div>
+      <p>Signature pad with custom accept/reject button classes</p>
+      <div id="display6" class="signature-pad"></div>
     </center>
     <script type='text/javascript'>
       var signature = new Signature({
@@ -76,87 +78,33 @@
             position: Signature.NORTH_EAST
           }
         });
+      var signature6 = new Signature( {
+          displayId: 'display6',
+          watermark: {
+            url: 'img/github.png',
+            position: Signature.CENTER,
+            alpha: 0.2,
+            width: 100,
+            height: 100
+          },
+          explanation: {
+            text: "This one has custom accept/reject button classes AND a watermark.",
+            font: "georgia",
+            color: "#aaa",
+            size: 12,
+            lineHeight: 13,
+            maxWidth: 250,
+            position: Signature.NORTH_EAST
+          },
+          buttonClass: "my-button-class"
+        });
     </script>
 
 
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h3>
 
-<ul>
-<li>Watermarking</li>
-<li>Saving images as PNG (with proper backend)</li>
-<li>Supports multiple signature captures on a single page</li>
-<li>Explanation text</li>
-<li>Supports
+<a href="https://github.com/maxwells/signature.js">available here</a>
 
-<ul>
-<li>Desktop</li>
-<li>Chrome</li>
-<li>Safari</li>
-<li>FireFox</li>
-<li>iOS</li>
-<li>Safari</li>
-<li>Chrome</li>
-<li>todo: testing</li>
-</ul>
-</li>
-</ul><h3>
-<a name="pipeline" class="anchor" href="#pipeline"><span class="octicon octicon-link"></span></a>Pipeline</h3>
-
-<ul>
-<li>acceptance/retry functionality</li>
-<li>export as SVG</li>
-<li>export as JSON vectors</li>
-</ul><h3>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
-
-<p>The following HTML and CSS snippets hold true for the following example usages</p>
-
-<div class="highlight"><pre><span class="nf">#my-signature-div</span> <span class="p">{</span> <span class="k">width</span><span class="o">:</span> <span class="m">400px</span><span class="p">;</span> <span class="k">height</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span> <span class="k">border</span><span class="o">:</span> <span class="k">thin</span> <span class="k">solid</span> <span class="nb">black</span><span class="p">;</span> <span class="p">}</span>
-</pre></div>
-
-<div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"my-signature-div"</span><span class="nt">&gt;&lt;/div&gt;</span>
-</pre></div>
-
-<p><strong>Basic</strong></p>
-
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">signature</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Signature</span><span class="p">({</span> <span class="nx">displayId</span><span class="o">:</span> <span class="s1">'my-signature-div'</span> <span class="p">});</span>
-</pre></div>
-
-<p><img src="img/basic.png" alt="Basic image"></p>
-
-<p><strong>Watermark</strong></p>
-
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">signature</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Signature</span><span class="p">({</span>
-    <span class="nx">displayId</span><span class="o">:</span> <span class="s1">'my-signature-div'</span><span class="p">,</span>
-    <span class="nx">watermark</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">url</span><span class="o">:</span> <span class="s1">'http://www.w3schools.com/images/compatible_chrome.gif'</span><span class="p">,</span>
-        <span class="nx">position</span><span class="o">:</span> <span class="nx">Signature</span><span class="p">.</span><span class="nx">CENTER</span><span class="p">,</span> <span class="c1">// any cardinal/ordinal direction or CENTER (defaults to NORTH)</span>
-        <span class="nx">alpha</span><span class="o">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="c1">// 0-1, representing transparency (default: 0.2)</span>
-        <span class="nx">width</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span> <span class="c1">// width of displayed watermark</span>
-        <span class="nx">height</span><span class="o">:</span> <span class="mi">100</span> <span class="c1">// height of displayed watermark</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-
-<p><img src="img/watermark.png" alt="Watermarked image"></p>
-
-<p><strong>Explanation Text</strong></p>
-
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">signature</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Signature</span><span class="p">(</span> <span class="p">{</span>
-    <span class="nx">displayId</span><span class="o">:</span> <span class="s1">'my-signature-div'</span><span class="p">,</span>
-    <span class="nx">explanation</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">text</span><span class="o">:</span> <span class="s2">"Signature signifies acceptace of aforementioned end user license agreement."</span><span class="p">,</span> <span class="c1">// set text for explanation</span>
-        <span class="nx">font</span><span class="o">:</span> <span class="s2">"georgia"</span><span class="p">,</span> <span class="c1">// choose a font (defaults to sans-serif)</span>
-        <span class="nx">color</span><span class="o">:</span> <span class="s2">"#aaa"</span><span class="p">,</span> <span class="c1">// defaults to #000</span>
-        <span class="nx">size</span><span class="o">:</span> <span class="mi">12</span><span class="p">,</span> <span class="c1">// defaults to 10 point</span>
-        <span class="nx">lineHeight</span><span class="o">:</span> <span class="mi">13</span><span class="p">,</span> <span class="c1">// defaults to 1.2em</span>
-        <span class="nx">maxWidth</span><span class="o">:</span> <span class="mi">150</span><span class="p">,</span> <span class="c1">// defaults to entire width</span>
-        <span class="nx">position</span><span class="o">:</span> <span class="nx">Signature</span><span class="p">.</span><span class="nx">NORTH_EAST</span> <span class="c1">// any cardinal/ordinal direction or CENTER (defaults to NORTH)</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-
-<p><img src="img/explanation.png" alt="Explanation image"></p>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
