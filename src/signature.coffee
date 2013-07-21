@@ -1,5 +1,6 @@
 class Signature
 
+  # "constants"
   @NORTH_WEST = 0
   @NORTH = 1
   @NORTH_EAST = 2
@@ -10,6 +11,37 @@ class Signature
   @SOUTH = 7
   @SOUTH_EAST = 8
 
+  # new Signature element
+  # options requires:
+  # - displayId: id of container DOM element
+  # optional options:
+  # - explanation: hash of elements to display some explanatory text
+  #     requires:
+  #       - text: String.
+  #     optional:
+  #       - font: String - what font to render (defaults to 'sans-serif')
+  #       - color: String - what color to render (defaults to '#000')
+  #       - size: int - what size to render text as (defaults to 10 point)
+  #       - lineHeight: int - how far from top of one line to top of one below it (defaults to 1.2 * size)
+  #       - maxWidth: int - how wide at most should text be before wrapping
+  #       - position: int - cardinal/ordinal direction (or centered) - defaults to Signature.NORTH
+  # - watermark: hash of elements to display a watermark
+  #     requires:
+  #       - url: String
+  #     optional:
+  #       - position: int - cardinal/ordinal direction (or centered) - defaults to Signature.CENTER
+  #       - alpha: number - 0-1 value representing transparency (defaults to 0.2, or 20% visible)
+  #       - scale: number representing size to scale by (1 = 100%, 3 = 300%, etc)
+  #       - width: int - number of pixels wide (will override scale)
+  #       - height: int - number of pixels tall (will override scale)
+  # - http: hash of elements to handle saving base64 png
+  #     requires:
+  #       - address: String - web address to hit
+  #     optional:
+  #       - verb: String - POST/GET (defaults to POST, because GET won't work for large enough images due to length limits)
+  #       - dataParam: String - what parameter to include base64 encoded png data in (defaults to "data")
+  #       - onSave: function - callback with JSON.parsed result from server
+  # - save: function (overrides built in http handling) - should take one parameter. this function will be passed the base64 encoded png data
   constructor: (options) ->
     alert "Signature requires a displayId in the options hash passed to it's constructor" unless options.displayId?
     @options = options
@@ -19,18 +51,30 @@ class Signature
     @width = @display.clientWidth
     @height = @display.clientHeight
 
+    @initialize()
+  
+  initialize: ->
+    @hasDrawn = false 
+
     @initializeCanvas()
+
+    @initializeHttp()
 
     @initializeExplanation() if @options.explanation?
 
     # watermark must be first thing drawn. If it is required,
     # then it must first be loaded before drawing signature pad
-    if options.watermark?
-      @setWatermark(options.watermark)
+    if @options.watermark?
+      @setWatermark(@options.watermark)
     else
       @setupPad()
 
     @setupListeners()
+
+  initializeHttp: ->
+    @options.http ||= {}
+    @options.http.verb ||= 'POST'
+    @options.http.dataParam ||= 'data'
 
   # setting watermark takes the following options
   # - position: (defaults to center) representing any of the cardinal/ordinal directions, as defined above (use Signature.NORTH as accessor)
@@ -52,7 +96,7 @@ class Signature
       
       width = options.width ? img.width * options.scale
       height = options.height ? img.height * options.scale
-      position = @determinePosition options.position, width, height 
+      position = @determineWatermarkPosition options.position, width, height 
       @context.drawImage img, position.x, position.y, width, height
       
       @context.globalAlpha = 1
@@ -60,7 +104,9 @@ class Signature
 
     imageObj.src = options.url
 
-  determinePosition: (position, width, height) =>
+  # returns appropriate location {x,y} based on width and height of it
+  # as well as cardinal/ordinal direction.
+  determineWatermarkPosition: (position, width, height) =>
     centerX = (@width - width) / 2
     centerY = (@height - height) / 2
     rightX = @width - width
@@ -76,6 +122,7 @@ class Signature
       when Signature.SOUTH then return x: centerX, y: bottomY
       when Signature.SOUTH_EAST then return x: rightX, y: bottomY
 
+  # setup default explanation options
   initializeExplanation: ->
     @explanation = @options.explanation
     @explanation.size ||= 10
@@ -86,6 +133,7 @@ class Signature
     @explanation.color ||= "#000"
     @explanation.position = Signature.NORTH unless @explanation.position?
 
+  # add canvas as child of display
   initializeCanvas: ->
     @canvas = document.createElement 'canvas'
     @canvas.id = 'signature-canvas'
@@ -95,6 +143,10 @@ class Signature
 
     @context = @canvas.getContext("2d")
 
+  # draw a line to canvas context
+  # takes a hash with
+  # - points: a list of {x,y} objects
+  # - lineWidth: width of line to draw
   drawLine: (options) ->
     return unless options.points.length > 1
     @context.beginPath()
@@ -104,6 +156,7 @@ class Signature
     @context.lineWidth = options.lineWidth ? 1
     @context.stroke()
 
+  # draw explanation (if exists), and the x ______ stuff
   setupPad: ->
     @drawExplanation() if @options.explanation?
 
@@ -156,26 +209,26 @@ class Signature
 
     @restoreContextTextStyle()
 
+  # squirrel away context text style state before some set of actions that requires changing them
   captureContextTextStyle: ->
     @contextFillStyle = @context.fillStyle
     @contextFontStyle = @context.font
     @contextTextBaseline = @context.textBaseline
 
+  # reset context to previous state before some set of actions
   restoreContextTextStyle: ->
     @context.fillStyle = @contextFillStyle
     @context.font = @contextFontStyle
     @context.textBaseline = @contextTextBaseline
 
+  # break up explanation text into multiple lines of content based on maxWidth (if necessary)
   wrapTextIfNecessary: (text, x, y, maxWidth, lineHeight) ->
-    words = text.split ' '
     line = ''
     lines = []
 
-    for word in words
+    for word in text.split ' '
       testLine = "#{line}#{word} "
       if @context.measureText(testLine).width > maxWidth
-        # console.log "drawing #{line}"
-        # @context.fillText(line, x, y);
         lines.push line
         line = "#{word} "
         y += lineHeight
@@ -183,8 +236,61 @@ class Signature
         line = testLine;
     lines.push line
     lines
-      
 
+  # references http://stackoverflow.com/questions/8567114/how-to-make-an-ajax-call-without-jquery
+  # attempt to save to address provided with http verb provided in @options.http
+  save: ->
+    if (window.XMLHttpRequest) # code for IE7+, Firefox, Chrome, Opera, Safari
+      xmlhttp = new XMLHttpRequest()
+    else # code for IE6, IE5
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP")
+  
+    if @options.http.onSave?
+      xmlhttp.onreadystatechange = =>
+        @options.http.onSave JSON.parse(xmlhttp.responseText)
+    else
+      xmlhttp.onreadystatechange = =>
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+          response = JSON.parse xmlhttp.responseText
+  
+    xmlhttp.open(@options.http.verb, @options.http.address, true)
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    console.log @asBase64PNG()
+    xmlhttp.send("#{@options.http.dataParam}=#{@asBase64PNG()}")
+  
+  # save if a save callback was provided or else if http parameters
+  acceptSignature: =>
+    if @options.save?
+      @options.save(@asBase64PNG())
+    else
+      @save() if @options.http?
+    @clearAndRemoveButtons()
+
+  rejectSignature: =>
+    @clearAndRemoveButtons()
+
+  # reset state
+  clearAndRemoveButtons: ->
+    @display.removeChild @canvas
+    @display.removeChild @accept
+    @display.removeChild @reject
+    @initialize()
+
+  # show accept/reject buttons
+  displayAcceptReject: ->
+    @accept = document.createElement 'button'
+    @accept.className = @options.buttonClass if @options.buttonClass?
+    @accept.innerHTML = "Accept"
+    @accept.onmouseup = @acceptSignature
+    @display.appendChild @accept
+
+    @reject = document.createElement 'button'
+    @reject.className = @options.buttonClass if @options.buttonClass?
+    @reject.innerHTML = "Reject"
+    @reject.onmouseup = @rejectSignature
+    @display.appendChild @reject
+
+  # export base64 encoded png version of image from canvas context
   asBase64PNG: ->
     @canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, "")
 
@@ -192,7 +298,6 @@ class Signature
     @display.onmousedown = @onMouseDown
     @display.onmouseup = @onMouseUp
     @display.onmouseout = @onMouseOut
-    @display.onmouseover = @onMouseOver
     @display.onmousemove = @onMouseMove
 
     @display.addEventListener("touchstart", @touchHandler, true);
@@ -200,6 +305,9 @@ class Signature
     @display.addEventListener("touchend", @touchHandler, true);
     @display.addEventListener("touchcancel", @touchHandler, true);
 
+  # thanks to http://stackoverflow.com/questions/1517924/javascript-mapping-touch-events-to-mouse-events
+  # takes a touch event and translates it into it's corresponding mouse event
+  # to allow handling with one function
   touchHandler: (e) ->
     touches = event.changedTouches
     first = touches[0]
@@ -215,13 +323,20 @@ class Signature
     simulatedEvent.initMouseEvent(type, true, true, window, 1, 
                               first.screenX, first.screenY, 
                               first.clientX, first.clientY, false, 
-                              false, false, false, 0, null);
+                              false, false, false, 0, null)
 
-    first.target.dispatchEvent(simulatedEvent);
-    e.preventDefault();
+    first.target.dispatchEvent simulatedEvent
+    e.preventDefault()
 
+  # if drawing, toggle accept/reject buttons if they haven't already
+  # been. Then draw a line from previous point to new one.
   onMouseMove: (e) =>
     if @drawing
+      
+      # show accept and reject buttons once some drawing has happened
+      @displayAcceptReject() unless @hasDrawn
+      @hasDrawn = true
+
       @newPoint = 
         x: e.offsetX ? e.layerX - @display.offsetLeft
         y: e.offsetY ? e.layerY - @display.offsetTop
@@ -231,20 +346,19 @@ class Signature
       @prevPoint = @newPoint
       console.log 'drawing'
 
+  # start drawing and track previous point
   onMouseDown: (e) =>
     @drawing = true
     @prevPoint =
       x: e.offsetX ? e.layerX - @display.offsetLeft
       y: e.offsetY ? e.layerY - @display.offsetTop
-    console.log e
 
+  # stop drawing
   onMouseUp: =>
     @drawing = false
 
+  # stop drawing
   onMouseOut: =>
     @drawing = false
 
-  onMouseOver: =>
-
-root = exports ? window
-root.Signature = Signature
+window.Signature = Signature

@@ -7,12 +7,18 @@
     <script type='text/javascript' src='lib/signature.js'></script>
   </head>
   <body>
-    <div id="display"></div>
-    <div id="display2"></div>
-    <div id="my-signature-div" style="width:400px; height:200px; margin:300px; border: thin solid black"></div>
+    <div id="display" class="signature-pad"></div>
+    <div id="display2" class="signature-pad"></div>
+    <div id="display3" class="signature-pad"></div>
+    <div id="display4" class="signature-pad"></div>
+    <div id="display5" class="signature-pad"></div>
+    <div id="display6" class="signature-pad"></div>
     <script type='text/javascript'>
       var signature = new Signature({
-        displayId: 'my-signature-div',
+        displayId: "display"
+      });
+      var signature2 = new Signature({
+        displayId: 'display2',
         watermark: {
           url: 'img/github.png',
           position: Signature.CENTER,
@@ -21,8 +27,8 @@
           height: 100
         }
       });
-      var signature = new Signature( {
-          displayId: 'display',
+      var signature3 = new Signature( {
+          displayId: 'display3',
           explanation: {
             text: "Signature signifies acceptace of aforementioned end user license agreement.",
             font: "georgia",
@@ -32,6 +38,59 @@
             maxWidth: 250,
             position: Signature.NORTH_EAST
           }
+        });
+      var signature4 = new Signature( {
+        displayId: 'display4',
+        explanation: {
+          text: "This one saves.",
+          font: "georgia",
+          color: "#aaa",
+          size: 12,
+          lineHeight: 13,
+          maxWidth: 250,
+          position: Signature.NORTH_EAST
+        },
+        http: {
+          verb: "POST",
+          address: "http://localhost:3000/images",
+          dataParam: 'data',
+          onSave: function(response) { alert(response.status); }
+        }
+      });
+      var signature5 = new Signature( {
+          displayId: 'display5',
+          explanation: {
+            text: "This one saves the way I want it to.",
+            font: "georgia",
+            color: "#aaa",
+            size: 12,
+            lineHeight: 13,
+            maxWidth: 250,
+            position: Signature.NORTH_EAST
+          },
+          save: function() {
+            $.post('images', function(response) { alert(response); });
+          }
+        });
+      var signature5 = new Signature( {
+          displayId: 'display6',
+          watermark: {
+            url: 'img/github.png',
+            position: Signature.CENTER,
+            alpha: 0.2,
+            width: 100,
+            height: 100
+          },
+          explanation: {
+            text: "This one has custom accept/reject button classes AND a watermark.",
+            font: "georgia",
+            color: "#aaa",
+            size: 12,
+            lineHeight: 13,
+            maxWidth: 250,
+            position: Signature.NORTH_EAST
+          },
+          buttonClass: "my-button-class"
         });
     </script>
   </body>
