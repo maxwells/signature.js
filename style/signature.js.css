@@ -1,0 +1,10 @@
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+}
+
+.signature-pad {
+  width: 300px;
+  height: 120px;
+  border: thin black solid;
+  margin: 20px auto;
+}

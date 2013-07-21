@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" type="text/css" href="style/signature.js.css"></link>
+    <script type='text/javascript' src='lib/signature.js'></script>
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
@@ -36,6 +38,47 @@
 <p>Super lightweight (~7kb minified), self-contained (no libraries), HTML 5 &amp; Javascript signature capture tool.</p>
 
 <h3>
+
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<center>
+      <p><b><i>If these examples do not work on your device, please note it in a <a href="https://github.com/maxwells/signature.js/issues/new">new issue</a> </i></b></p>
+      <p>Regular old signature pad</p>
+      <div id="display" class="signature-pad"></div>
+      <p>Signature pad with watermark</p>
+      <div id="display2" class="signature-pad"></div>
+      <p>Signature pad with explanation</p>
+      <div id="display3" class="signature-pad"></div>
+    </center>
+    <script type='text/javascript'>
+      var signature = new Signature({
+        displayId: "display"
+      });
+      var signature2 = new Signature({
+        displayId: 'display2',
+        watermark: {
+          url: 'img/github.png',
+          position: Signature.CENTER,
+          alpha: 0.2,
+          width: 100,
+          height: 100
+        }
+      });
+      var signature3 = new Signature( {
+          displayId: 'display3',
+          explanation: {
+            text: "Signature signifies acceptace of aforementioned end user license agreement.",
+            font: "georgia",
+            color: "#aaa",
+            size: 12,
+            lineHeight: 13,
+            maxWidth: 250,
+            position: Signature.NORTH_EAST
+          }
+        });
+    </script>
+
+
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
 
 <ul>
