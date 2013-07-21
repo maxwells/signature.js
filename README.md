@@ -4,7 +4,7 @@ Super lightweight (~8kb minified), self-contained (no libraries), HTML 5 & Javas
 
 ### Examples
 
-[here](maxwells.github.io/)
+[here](http://maxwells.github.io/signature.js)
 
 ### Features
 
