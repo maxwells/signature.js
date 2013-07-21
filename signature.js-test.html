@@ -11,7 +11,24 @@
     <div id="display2"></div>
     <script type='text/javascript'>
       var signature = new Signature({displayId: 'display', watermark: {url: 'http://www.w3schools.com/images/compatible_chrome.gif', position: Signature.CENTER, alpha: 1, width: 100, height: 100} });
-      var signature = new Signature({displayId: 'display2', watermark: {url: 'http://www.w3schools.com/images/compatible_chrome.gif', position: Signature.SOUTH_WEST, alpha: 0.1, scale: 2} });
+      var signature = new Signature( {
+          displayId: 'display2',
+          watermark: {
+            url: 'http://www.w3schools.com/images/compatible_chrome.gif',
+            position: Signature.SOUTH_WEST,
+            alpha: 0.1,
+            scale: 2
+          },
+          explanation: {
+            text: "Signature signifies acceptace of aforementioned end user license agreement.",
+            font: "georgia",
+            color: "#aaa",
+            size: 10,
+            lineHeight: 13,
+            maxWidth: 150,
+            position: Signature.NORTH_EAST
+          }
+        });
     </script>
   </body>
 </html>

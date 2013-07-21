@@ -1,14 +1,14 @@
 class Signature
 
-  @NORTH_WEST = 1
-  @NORTH = 2
-  @NORTH_EAST = 3
-  @WEST = 4
-  @CENTER = 5
-  @EAST = 6
-  @SOUTH_WEST = 7
-  @SOUTH = 8
-  @SOUTH_EAST = 9
+  @NORTH_WEST = 0
+  @NORTH = 1
+  @NORTH_EAST = 2
+  @WEST = 3
+  @CENTER = 4
+  @EAST = 5
+  @SOUTH_WEST = 6
+  @SOUTH = 7
+  @SOUTH_EAST = 8
 
   constructor: (options) ->
     alert "Signature requires a displayId in the options hash passed to it's constructor" unless options.displayId?
@@ -20,6 +20,8 @@ class Signature
     @height = @display.clientHeight
 
     @initializeCanvas()
+
+    @initializeExplanation() if @options.explanation?
 
     # watermark must be first thing drawn. If it is required,
     # then it must first be loaded before drawing signature pad
@@ -74,6 +76,16 @@ class Signature
       when Signature.SOUTH then return x: centerX, y: bottomY
       when Signature.SOUTH_EAST then return x: rightX, y: bottomY
 
+  initializeExplanation: ->
+    @explanation = @options.explanation
+    @explanation.size ||= 10
+    @explanation.weight ||= "normal"
+    @explanation.font ||= "sans-serif"
+    @explanation.maxWidth ||= @display.offsetWidth
+    @explanation.lineHeight ||= @explanation.size * 1.2
+    @explanation.color ||= "#000"
+    @explanation.position = Signature.NORTH unless @explanation.position?
+
   initializeCanvas: ->
     @canvas = document.createElement 'canvas'
     @canvas.id = 'signature-canvas'
@@ -93,6 +105,8 @@ class Signature
     @context.stroke()
 
   setupPad: ->
+    @drawExplanation() if @options.explanation?
+
     @drawLine
       points: [{ x: 20, y: @height - 15 }, { x: @width - 20, y: @height - 15}]
 
@@ -105,6 +119,71 @@ class Signature
       points: [{ x: 35, y: @height - 32},
                { x: 25, y: @height - 22}]
       lineWidth: 2
+      
+  # draws explanation based on position, font-size, font, font-weight, and max-width
+  drawExplanation: ->
+    @captureContextTextStyle()
+
+    @context.font = "#{@explanation.weight} #{@explanation.size}px #{@explanation.font}"
+    @context.textBaseline = "top"
+    @context.fillStyle = @explanation.color
+
+    position = {}
+    
+    # horizontal position and text alignment based on ordinal/cardinal direction
+    switch(@explanation.position % 3)
+      when 0
+        @context.textAlign = "left"
+        position.x = 0
+      when 1
+        @context.textAlign = "center"
+        position.x = @width / 2
+      when 2
+        @context.textAlign = "right"
+        position.x = @width
+
+    lines = @wrapTextIfNecessary(@explanation.text, position.x, position.y, @explanation.maxWidth, @explanation.lineHeight)
+
+    # vertical position based on ordinal/cardinal direction and number of lines of explanation text
+    switch Math.floor(@explanation.position / 3)
+      when 0 then position.y = 0
+      when 1 then position.y = @height / 2 - lines.length * @explanation.lineHeight / 2
+      when 2 then position.y = @height - lines.length * @explanation.lineHeight
+
+    for line in lines
+      @context.fillText(line, position.x, position.y);
+      position.y += @explanation.lineHeight
+
+    @restoreContextTextStyle()
+
+  captureContextTextStyle: ->
+    @contextFillStyle = @context.fillStyle
+    @contextFontStyle = @context.font
+    @contextTextBaseline = @context.textBaseline
+
+  restoreContextTextStyle: ->
+    @context.fillStyle = @contextFillStyle
+    @context.font = @contextFontStyle
+    @context.textBaseline = @contextTextBaseline
+
+  wrapTextIfNecessary: (text, x, y, maxWidth, lineHeight) ->
+    words = text.split ' '
+    line = ''
+    lines = []
+
+    for word in words
+      testLine = "#{line}#{word} "
+      if @context.measureText(testLine).width > maxWidth
+        # console.log "drawing #{line}"
+        # @context.fillText(line, x, y);
+        lines.push line
+        line = "#{word} "
+        y += lineHeight
+      else
+        line = testLine;
+    lines.push line
+    lines
+      
 
   asBase64PNG: ->
     @canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, "")
