@@ -174,3 +174,5 @@ var signature5 = new Signature( {
 
 
 ![Custom css class](img/custom.png)
+
+### MIT License
